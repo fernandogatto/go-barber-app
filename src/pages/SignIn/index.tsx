@@ -1,6 +1,14 @@
-import React from 'react';
-import { Image, KeyboardAvoidingView, ScrollView, Platform, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  Image,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+  View,
+  Keyboard,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { useNavigation } from '@react-navigation/native';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -17,6 +25,30 @@ import {
 } from './styles';
 
 const SignIn:React.FC = () => {
+  const navigation = useNavigation();
+
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
     <>
       <KeyboardAvoidingView
@@ -53,11 +85,13 @@ const SignIn:React.FC = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <CreateAccountButton onPress={() => { console.log('Create account'); }}>
-        <Icon name="log-in" size={20} color="#ff9000" />
+      { !isKeyboardVisible && (
+        <CreateAccountButton onPress={() => navigation.navigate('SignUp')}>
+          <Icon name="log-in" size={20} color="#ff9000" />
 
-        <CreateAccountButtonText>Criar uma conta</CreateAccountButtonText>
-      </CreateAccountButton>
+          <CreateAccountButtonText>Criar uma conta</CreateAccountButtonText>
+        </CreateAccountButton>
+      )}
     </>
   );
 };
