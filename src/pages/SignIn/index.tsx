@@ -16,6 +16,8 @@ import * as Yup from 'yup';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 
+import { useAuth } from '../../hooks/AuthContext';
+
 import getValidationErros from '../../utils/getValidationErrors';
 
 import Input from '../../components/Input';
@@ -43,6 +45,8 @@ const SignIn:React.FC = () => {
   const navigation = useNavigation();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
+  const { signIn } = useAuth();
+
   const handleSignIn = useCallback(async (data: SignInFormData) => {
     try {
       formRef.current?.setErrors({});
@@ -59,12 +63,10 @@ const SignIn:React.FC = () => {
         abortEarly: false,
       });
 
-      // await signIn({
-      //   email: data.email,
-      //   password: data.password,
-      // });
-
-      // history.push('/dashboard');
+      await signIn({
+        email: data.email,
+        password: data.password,
+      });
     } catch(err) {
       if(err instanceof Yup.ValidationError) {
         const errors = getValidationErros(err);
@@ -77,7 +79,7 @@ const SignIn:React.FC = () => {
         'Ocorreu um erro ao fazer login. Cheque as credenciais.'
       );
     }
-  }, []);
+  }, [signIn]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
